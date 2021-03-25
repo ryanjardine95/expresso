@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "492727493102",
+    "project_id": "expresso-f3da9",
+    "storage_bucket": "expresso-f3da9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:492727493102:android:f32c8e6727c9aee4ed6eff",
+        "android_client_info": {
+          "package_name": "com.example.expresso_mobile_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "492727493102-uigdh0tm3lmunbrm3p43bql1vc63ehat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTs8qgaldswI218bRGkoUdQSPWN8c3SDo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "492727493102-uigdh0tm3lmunbrm3p43bql1vc63ehat.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "492727493102-b79bolqtu0ercma49ms9av8ie85n415i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.expressoMobileApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
