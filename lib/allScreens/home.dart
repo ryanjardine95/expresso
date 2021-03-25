@@ -67,16 +67,16 @@ class _HomeState extends State<Home> {
               right: 10.0,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.0),
                 ),
-                child: Column(
-                  children: [
-                    Text("Begin by selecting your nearest store!", style: TextStyle(fontSize: 20.0)),
-                    Divider(
-                      thickness: 5.0,
-                      color: Colors.black38,
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      Text("Begin by selecting your nearest store!", style: TextStyle(fontSize: 20.0), textAlign: TextAlign.center),
+                    ],
+                  ),
                 ),
               )
           ),
