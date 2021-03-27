@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expresso_mobile_app/allScreens/loginScreen.dart';
-import 'package:expresso_mobile_app/allScreens/signupScreen.dart';
+import 'package:expresso_mobile_app/allScreens/UserLoginScreen.dart';
+import 'package:expresso_mobile_app/allScreens/storeHomeScreen.dart';
+import 'package:expresso_mobile_app/allScreens/storeSignup.dart';
+import 'package:expresso_mobile_app/allScreens/userSignupScreen.dart';
+import 'package:expresso_mobile_app/widgets/loginHomeWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,14 +18,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: _initialization,
         builder: (context, snapshot) {
-          if (snapshot.hasError){
+          if (snapshot.hasError) {
             return SomethingWentWrong();
           }
           // Once complete, show the application
@@ -38,6 +42,8 @@ class MyApp extends StatelessWidget {
                 'SignUp': (context) => SignUp(),
                 'LogIn': (context) => Login(),
                 'Home': (context) => Home(),
+                StoreLogin.routeName: (context) => StoreLogin(),
+                StoreHomeScreen.routeName: (context) => StoreHomeScreen(),
               },
             );
           }
@@ -52,10 +58,10 @@ class SomethingWentWrong extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text("Something is wrong. Please check you are connected to the internet"),
+      child: Text(
+          "Something is wrong. Please check you are connected to the internet"),
     );
   }
-
 }
 
 class MyHomePage extends StatefulWidget {
@@ -71,53 +77,40 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Colors.grey,
-      //   title: Text(widget.title),
-      // ),
-      body: auth.currentUser == null? Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  child: SizedBox(
-                    child: Image.asset(
-                        "assets/images/ExpressoLogoTransparentBackground.png"),
-                  ),
+        // appBar: AppBar(
+        //   backgroundColor: Colors.grey,
+        //   title: Text(widget.title),
+        // ),
+        body: StreamBuilder(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapShot) {
+        if (snapShot.hasData && snapShot.data != null) {
+          return StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection("users")
+                .doc(snapShot.data.uid)
+                .snapshots(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                final user = snapshot.data.data();
+                if (user['userRole'] == 'Store') {
+                  return StoreHomeScreen();
+                } else {
+                  return Home();
+                }
+              }
+              return Material(
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, "LogIn");
-                      },
-                      child: Text("Login"),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, "SignUp");
-                      },
-                      child: Text("Sign up"),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: InkWell(
-                    child: Text("click here if you're a new store!"),
-                    onTap: () {},
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ): Home(), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+              );
+            },
+          );
+        } else {
+          return homePageLogin(context);
+        }
+      },
+    ));
   }
 }
-
