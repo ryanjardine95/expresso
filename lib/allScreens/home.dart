@@ -17,7 +17,7 @@ class _HomeState extends State<Home> {
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   //google maps
   Completer<GoogleMapController> _controller = Completer();
-  GoogleMapController newGoogleMapController; 
+  GoogleMapController newGoogleMapController;
   Geolocator geoLocator = Geolocator();
   Position userPosition;
   //example position for when maps start without a location
@@ -30,7 +30,8 @@ class _HomeState extends State<Home> {
     Position position = await Geolocator.getCurrentPosition();
     LatLng latLng = LatLng(position.latitude, position.longitude);
     CameraPosition cameraPosition = CameraPosition(target: latLng, zoom: 14.0);
-    newGoogleMapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    newGoogleMapController
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   @override
@@ -49,7 +50,7 @@ class _HomeState extends State<Home> {
         children: [
           GoogleMap(
             //padding: EdgeInsets.only(top: 100.0, bottom: 200.0),
-              initialCameraPosition: _kGooglePlex,
+            initialCameraPosition: _kGooglePlex,
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             zoomGesturesEnabled: true,
@@ -62,7 +63,7 @@ class _HomeState extends State<Home> {
             },
           ),
           Positioned(
-            top: 100.0,
+              top: 100.0,
               left: 10.0,
               right: 10.0,
               child: Container(
@@ -74,13 +75,18 @@ class _HomeState extends State<Home> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
-                      Text("Begin by selecting your nearest store!", style: TextStyle(fontSize: 20.0), textAlign: TextAlign.center),
+                      Text("Begin by selecting your nearest store!",
+                          style: TextStyle(fontSize: 20.0),
+                          textAlign: TextAlign.center),
                     ],
                   ),
                 ),
-              )
-          ),
+              )),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Text('logout'),
+        onPressed: () => FirebaseAuth.instance.signOut(),
       ),
     );
   }
