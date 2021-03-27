@@ -1,19 +1,18 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expresso_mobile_app/allScreens/storeHomeScreen.dart';
 import 'package:expresso_mobile_app/helpers/location_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-class StoreLogin extends StatefulWidget {
+class StoreSignUp extends StatefulWidget {
   static const routeName = '/StoreLogin';
   @override
   _StoreLoginState createState() => _StoreLoginState();
 }
 
-class _StoreLoginState extends State<StoreLogin> {
+class _StoreLoginState extends State<StoreSignUp> {
   String yourName;
   String storeName;
   String emailAdress;
@@ -35,7 +34,6 @@ class _StoreLoginState extends State<StoreLogin> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   CollectionReference stores = FirebaseFirestore.instance.collection("stores");
-
 
   Future fireBaseRegister() async {
     setState(() {
@@ -99,6 +97,7 @@ class _StoreLoginState extends State<StoreLogin> {
       });
     } else {
       setState(() {
+        showAboutDialog(context: context);
         AlertDialog(
           content: Text('Double check info'),
           actions: [
@@ -256,8 +255,6 @@ class _StoreLoginState extends State<StoreLogin> {
           ElevatedButton(
             onPressed: () {
               signUpStore();
-              Navigator.of(context)
-                  .pushReplacementNamed(StoreHomeScreen.routeName);
             },
             child: Text("Done"),
           )

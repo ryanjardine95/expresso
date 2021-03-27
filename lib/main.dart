@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expresso_mobile_app/allScreens/UserLoginScreen.dart';
 import 'package:expresso_mobile_app/allScreens/storeHomeScreen.dart';
+import 'package:expresso_mobile_app/allScreens/storeLogin.dart';
+import 'package:expresso_mobile_app/allScreens/storeLoginInorSignup.dart';
 import 'package:expresso_mobile_app/allScreens/storeSignup.dart';
 import 'package:expresso_mobile_app/allScreens/userSignupScreen.dart';
 import 'package:expresso_mobile_app/widgets/loginHomeWidget.dart';
+import 'package:expresso_mobile_app/widgets/tabs_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -42,8 +45,13 @@ class MyApp extends StatelessWidget {
                 'SignUp': (context) => SignUp(),
                 'LogIn': (context) => Login(),
                 'Home': (context) => Home(),
-                StoreLogin.routeName: (context) => StoreLogin(),
+                StoreSignUp.routeName: (context) => StoreSignUp(),
                 StoreHomeScreen.routeName: (context) => StoreHomeScreen(),
+                // ignore: equal_keys_in_map
+                StoreLoginScreen.routeName: (context) => StoreLoginScreen(),
+                StoreLoginSignUp.routeName: (context) => StoreLoginSignUp(),
+                TabsScreen.routeName: (context) => TabsScreen(),
+
               },
             );
           }
@@ -95,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if (snapshot.hasData && snapshot.data != null) {
                 final user = snapshot.data.data();
                 if (user['userRole'] == 'Store') {
-                  return StoreHomeScreen();
+                  return TabsScreen();
                 } else {
                   return Home();
                 }

@@ -1,12 +1,15 @@
+import 'package:expresso_mobile_app/allScreens/storeHomeScreen.dart';
+import 'package:expresso_mobile_app/widgets/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class Login extends StatefulWidget {
+class StoreLoginScreen extends StatefulWidget {
+  static const routeName = '/StoreLogin';
   @override
-  _LoginState createState() => _LoginState();
+  _StoreScreenLoginState createState() => _StoreScreenLoginState();
 }
 
-class _LoginState extends State<Login> {
+class _StoreScreenLoginState extends State<StoreLoginScreen> {
   bool _isLoading = false;
 
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -101,11 +104,9 @@ class _LoginState extends State<Login> {
       _isLoading = true;
     });
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-              email: emailController.text, password: passwordController.text);
+      FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
       //add navigation to main screen on succesful login
-      Navigator.of(context).pop();
       print('hello');
       setState(() {
         _isLoading = false;

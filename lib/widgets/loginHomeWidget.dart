@@ -1,4 +1,4 @@
-import 'package:expresso_mobile_app/allScreens/storeSignup.dart';
+import 'package:expresso_mobile_app/allScreens/storeLoginInorSignup.dart';
 import 'package:flutter/material.dart';
 
 Widget homePageLogin(BuildContext context) {
@@ -37,7 +37,7 @@ Widget homePageLogin(BuildContext context) {
               child: InkWell(
                 child: Text("Click here if you're a new store!"),
                 onTap: () {
-                  Navigator.of(context).pushNamed(StoreLogin.routeName);
+                  Navigator.of(context).pushNamed(StoreLoginSignUp.routeName);
                 },
               ),
             ),

@@ -12,7 +12,6 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(children: [
           Image.asset('assets/images/Expresso Name Transparent Background.png'),
@@ -27,7 +26,7 @@ class _StoreHomeScreenState extends State<StoreHomeScreen> {
                   itemBuilder: (context, i) {
                     var location = docs[i]['latLang'].toString();
                     String lat = location.toString().substring(17, 29);
-                    String long = location.toString().substring(37, 47);
+                    String long = location.toString().substring(36, 46);
 
                     return ListTile(
                       title: Column(
