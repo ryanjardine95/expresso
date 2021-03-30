@@ -35,9 +35,9 @@ Widget homePageLogin(BuildContext context) {
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: InkWell(
-                child: Text("Click here if you're a new store!"),
+                child: Text("Click here if you're an Expresso store!"),
                 onTap: () {
-                  Navigator.of(context).pushNamed(StoreLogin.routeName);
+                  Navigator.of(context).pushNamed('StoreAuth');
                 },
               ),
             ),

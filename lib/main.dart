@@ -1,7 +1,8 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expresso_mobile_app/allScreens/UserLoginScreen.dart';
+import 'package:expresso_mobile_app/allScreens/addMenuItem.dart';
+import 'package:expresso_mobile_app/allScreens/storeAuth.dart';
 import 'package:expresso_mobile_app/allScreens/storeHomeScreen.dart';
 import 'package:expresso_mobile_app/allScreens/storeSignup.dart';
 import 'package:expresso_mobile_app/allScreens/userSignupScreen.dart';
@@ -9,8 +10,10 @@ import 'package:expresso_mobile_app/widgets/loginHomeWidget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'allScreens/editMenuItem.dart';
 import 'allScreens/home.dart';
+import 'allScreens/storeLogin.dart';
+import 'allScreens/storeMenu.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,8 +45,13 @@ class MyApp extends StatelessWidget {
                 'SignUp': (context) => SignUp(),
                 'LogIn': (context) => Login(),
                 'Home': (context) => Home(),
-                StoreLogin.routeName: (context) => StoreLogin(),
-                StoreHomeScreen.routeName: (context) => StoreHomeScreen(),
+                'StoreLogIn': (context) => StoreLogin(),
+                'StoreRegister': (context) => StoreRegister(),
+                'StoreHome': (context) => StoreHomeScreen(),
+                'StoreAuth': (context) => StoreAuth(),
+                'StoreMenu': (context) => StoreMenu(),
+                'AddMenuItem': (context) => AddMenuItem(),
+                'EditMenuItem': (context) => EditMenuItem(),
               },
             );
           }
@@ -77,40 +85,40 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   backgroundColor: Colors.grey,
-        //   title: Text(widget.title),
-        // ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.grey,
+      //   title: Text(widget.title),
+      // ),
         body: StreamBuilder(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapShot) {
-        if (snapShot.hasData && snapShot.data != null) {
-          return StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("users")
-                .doc(snapShot.data.uid)
-                .snapshots(),
-            builder: (BuildContext context,
-                AsyncSnapshot<DocumentSnapshot> snapshot) {
-              if (snapshot.hasData && snapshot.data != null) {
-                final user = snapshot.data.data();
-                if (user['userRole'] == 'Store') {
-                  return StoreHomeScreen();
-                } else {
-                  return Home();
-                }
-              }
-              return Material(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapShot) {
+            if (snapShot.hasData && snapShot.data != null) {
+              return StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(snapShot.data.uid)
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.hasData && snapshot.data != null) {
+                    final user = snapshot.data.data();
+                    if (user['userRole'] == 'Store') {
+                      return StoreHomeScreen();
+                    } else {
+                      return Home();
+                    }
+                  }
+                  return Material(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                },
               );
-            },
-          );
-        } else {
-          return homePageLogin(context);
-        }
-      },
-    ));
+            } else {
+              return homePageLogin(context);
+            }
+          },
+        ));
   }
 }

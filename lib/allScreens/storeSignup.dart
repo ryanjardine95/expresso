@@ -1,19 +1,19 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expresso_mobile_app/allScreens/storeHomeScreen.dart';
 import 'package:expresso_mobile_app/helpers/location_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-class StoreLogin extends StatefulWidget {
+class StoreRegister extends StatefulWidget {
   static const routeName = '/StoreLogin';
   @override
-  _StoreLoginState createState() => _StoreLoginState();
+  _StoreRegisterState createState() => _StoreRegisterState();
 }
 
-class _StoreLoginState extends State<StoreLogin> {
+class _StoreRegisterState extends State<StoreRegister> {
   String yourName;
   String storeName;
   String emailAdress;
@@ -43,31 +43,33 @@ class _StoreLoginState extends State<StoreLogin> {
     });
     try {
       UserCredential storeCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailAdress,
         password: passWord,
       );
-      try {
-        users.doc(storeCredential.user.uid).set({
-          'userid': storeCredential.user.uid,
-          'yourName': yourName,
-          'storeName': storeName,
-          'email': emailAdress,
-          'phone': phoneNumber,
-          'password': passWord,
-          'latLang': locDatas.toString(),
-          'userRole': 'Store',
-        });
-        stores.add({
-          'userid': storeCredential.user.uid,
-          'latLang': locDatas.toString(),
-        });
-      } catch (e) {
-        throw (e);
-      }
+
+      await users.doc(storeCredential.user.uid).set({
+        'userid': storeCredential.user.uid,
+        'yourName': yourName,
+        'storeName': storeName,
+        'email': emailAdress,
+        'phone': phoneNumber,
+        'password': passWord,
+        'latitude': latitude,
+        'longitude': longitude,
+        'userRole': 'Store',
+      });
+
+      await stores.add({
+        'userid': storeCredential.user.uid,
+        'latitude': latitude,
+        'longitude': longitude,
+      });
       setState(() {
         _isLoading = false;
       });
+      Navigator.of(context)
+          .pushReplacementNamed(StoreHomeScreen.routeName);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -117,89 +119,96 @@ class _StoreLoginState extends State<StoreLogin> {
         ? Center(
             child: CircularProgressIndicator(),
           )
-        : SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(25),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15.0),
-                    child: Center(
-                      child: Container(
-                        child: Image.asset(
-                            "assets/images/Expresso Name Transparent Background.png"),
+        : Center(
+          child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(25),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15.0),
+                      child: Center(
+                        child: Container(
+                          child: Image.asset(
+                              "assets/images/Expresso Name Transparent Background.png"),
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(15),
-                    child: TextFormField(
-                      keyboardType: TextInputType.name,
-                      controller: nameController,
-                      decoration: InputDecoration(labelText: 'Your Name'),
+                    Padding(
+                      padding: EdgeInsets.all(15),
+                      child: TextFormField(
+                        keyboardType: TextInputType.name,
+                        controller: nameController,
+                        decoration: InputDecoration(labelText: 'Your Name'),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(15),
-                    child: TextFormField(
-                      keyboardType: TextInputType.name,
-                      controller: storeNameController,
-                      decoration: InputDecoration(labelText: 'Store Name'),
+                    Padding(
+                      padding: EdgeInsets.all(15),
+                      child: TextFormField(
+                        keyboardType: TextInputType.name,
+                        controller: storeNameController,
+                        decoration: InputDecoration(labelText: 'Store Name'),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(15),
-                    child: TextFormField(
-                      keyboardType: TextInputType.emailAddress,
-                      controller: emailAdressController,
-                      decoration: InputDecoration(labelText: 'Email Adress'),
+                    Padding(
+                      padding: EdgeInsets.all(15),
+                      child: TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        controller: emailAdressController,
+                        decoration: InputDecoration(labelText: 'Email Adress'),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(15),
-                    child: TextFormField(
-                      keyboardType: TextInputType.phone,
-                      controller: phoneNumberContoller,
-                      decoration: InputDecoration(labelText: 'Phone number'),
+                    Padding(
+                      padding: EdgeInsets.all(15),
+                      child: TextFormField(
+                        keyboardType: TextInputType.phone,
+                        controller: phoneNumberContoller,
+                        decoration: InputDecoration(labelText: 'Phone number'),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(15),
-                    child: TextFormField(
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
-                      controller: passWordController,
-                      decoration: InputDecoration(labelText: 'Password'),
+                    Padding(
+                      padding: EdgeInsets.all(15),
+                      child: TextFormField(
+                        keyboardType: TextInputType.visiblePassword,
+                        obscureText: true,
+                        controller: passWordController,
+                        decoration: InputDecoration(labelText: 'Password'),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(15),
-                    child: TextFormField(
-                      obscureText: true,
-                      controller: passWordConfirmController,
-                      decoration:
-                          InputDecoration(labelText: 'Confrim Password'),
+                    Padding(
+                      padding: EdgeInsets.all(15),
+                      child: TextFormField(
+                        obscureText: true,
+                        controller: passWordConfirmController,
+                        decoration:
+                            InputDecoration(labelText: 'Confrim Password'),
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        print('NextBtn');
-                        setState(() {
-                          _counter = 1;
-                        });
-                        print(_counter);
-                      },
-                      child: Text('Next'))
-                ],
+                    ElevatedButton(
+                        onPressed: () {
+                          print('NextBtn');
+                          setState(() {
+                            _counter = 1;
+                          });
+                          print(_counter);
+                        },
+                        child: Text('Next')
+                    ),
+                    ElevatedButton(onPressed: (){
+                      Navigator.pop(context);
+                    }, child: Text("Back"))
+                  ],
+                ),
               ),
             ),
-          );
+        );
   }
 
   String _previewImageUrl;
   bool _isGettingLocal = false;
-  var locDatas;
+  double latitude;
+  double longitude;
   Future<void> _getCurrentUserLocation() async {
     final locData = await Location().getLocation();
     final staticMap = LocationHelper.generateLocationPreviewImage(
@@ -207,7 +216,8 @@ class _StoreLoginState extends State<StoreLogin> {
     setState(() {
       _previewImageUrl = staticMap;
       _isGettingLocal = true;
-      locDatas = locData;
+      latitude = locData.latitude;
+      longitude = locData.longitude;
     });
     print(locData.latitude + locData.longitude);
   }
@@ -254,10 +264,8 @@ class _StoreLoginState extends State<StoreLogin> {
             ],
           ),
           ElevatedButton(
-            onPressed: () {
-              signUpStore();
-              Navigator.of(context)
-                  .pushReplacementNamed(StoreHomeScreen.routeName);
+            onPressed: () async {
+              await signUpStore();
             },
             child: Text("Done"),
           )

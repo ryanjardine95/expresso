@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expresso_mobile_app/models/storeModel.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
@@ -15,6 +16,11 @@ class _HomeState extends State<Home> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseAuth auth = FirebaseAuth.instance;
   CollectionReference users = FirebaseFirestore.instance.collection("users");
+
+  List<StoreModel> stores = [];
+
+  Set<Marker> _markers = {};
+
   //google maps
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController newGoogleMapController;
@@ -36,16 +42,35 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> getStoreList() async {
+      try{
+        await FirebaseFirestore.instance.collection("stores").get().then((value) {value.docs.forEach((element) {
+          print(element.data());
+          setState(() {
+            stores.add(StoreModel(
+              storeId: element['userid'],
+              latitude: element['latitude'],
+              longitude: element['longitude']
+            ));
+            print(stores);
+          });
+        });
+        });
+        await stores.forEach((element) {
+          _markers.add(Marker(
+            markerId: MarkerId(element.storeId),
+            position: LatLng(element.latitude, element.longitude),
+            onTap: (){
+              print(Text("you clicked ${element.storeId} store"));
+            },
+          ));
+        });
+        print(_markers);
+      }catch(e){
+        throw(e);
+      }
+    }
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text("${auth.currentUser.email}"),
-      //   actions: [
-      //     IconButton(onPressed: (){
-      //       auth.signOut();
-      //       Navigator.pushNamed(context, "/");
-      //     }, icon: Icon(Icons.exit_to_app))
-      //   ],
-      // ),
       body: Stack(
         children: [
           GoogleMap(
@@ -59,8 +84,11 @@ class _HomeState extends State<Home> {
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
               newGoogleMapController = controller;
+              getStoreList();
               locateUser();
+              print(stores);
             },
+            markers: _markers,
           ),
           Positioned(
               top: 100.0,
@@ -84,10 +112,19 @@ class _HomeState extends State<Home> {
               )),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Text('logout'),
-        onPressed: () => FirebaseAuth.instance.signOut(),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.fromLTRB(10.0, 0, 60.0, 0),
+        child: FloatingActionButton.extended(
+            onPressed: (){
+              auth.signOut();
+              Navigator.pushNamed(context, '/');
+            },
+            label: Text("Logout")),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   child: Text('logout'),
+      //   onPressed: () => FirebaseAuth.instance.signOut(),
+      // ),
     );
   }
 }
