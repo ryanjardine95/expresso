@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
@@ -67,7 +66,7 @@ class _LoginState extends State<Login> {
                         setState((){
                           email = emailController.text;
                           password = passwordController.text;
-                          SignIn();
+                          signIn();
                         });
                       }else{
                         setState(() {
@@ -96,11 +95,12 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Future SignIn() async {
+  Future signIn() async {
     setState(() {
       _isLoading = true;
     });
     try {
+      // ignore: unused_local_variable
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text

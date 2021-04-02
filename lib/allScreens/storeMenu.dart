@@ -39,7 +39,6 @@ class _StoreMenuState extends State<StoreMenu> {
     } catch (e) {
       throw (e);
     }
-    // TODO: implement initState
     super.initState();
   }
 

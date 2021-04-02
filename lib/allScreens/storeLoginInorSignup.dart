@@ -1,14 +1,14 @@
+import 'package:expresso_mobile_app/allScreens/storeLogin.dart';
 import 'package:flutter/material.dart';
 
-class StoreAuth extends StatefulWidget {
-  @override
-  _StoreAuthState createState() => _StoreAuthState();
-}
-
-class _StoreAuthState extends State<StoreAuth> {
+class StoreLoginSignUp extends StatelessWidget {
+  static const routeName = '/StoreloginSignUp';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Store Page'),
+      ),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -27,27 +27,19 @@ class _StoreAuthState extends State<StoreAuth> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, 'StoreLogIn');
+                        Navigator.of(context)
+                            .pushReplacementNamed(StoreLogin.routeName);
                       },
                       child: Text("Login"),
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, 'StoreRegister');
+                        /* Navigator.of(context)
+                            .pushReplacementNamed(StoreSignUp.routeName); */
                       },
                       child: Text("Sign up"),
                     ),
                   ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: InkWell(
-                    child: Text("Click here if you're an Expresso User!"),
-                    onTap: () {
-                      // ignore: unnecessary_statements
-                      Navigator.pushNamed(context, '/');
-                    },
-                  ),
                 ),
               ],
             ),
@@ -57,4 +49,3 @@ class _StoreAuthState extends State<StoreAuth> {
     );
   }
 }
-

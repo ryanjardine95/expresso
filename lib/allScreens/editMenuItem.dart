@@ -29,7 +29,6 @@ class _EditMenuItemState extends State<EditMenuItem> {
     productName.text = menuItemName;
     productDescription.text = menuItemDescription;
     productPrice.text = menuItemPrice;
-    // TODO: implement initState
     super.initState();
   }
 

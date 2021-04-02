@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
                 'Home': (context) => Home(),
                 'StoreLogIn': (context) => StoreLogin(),
                 'StoreRegister': (context) => StoreRegister(),
-                'StoreHome': (context) => StoreHomeScreen(),
+                StoreHomeScreen.routeName: (context) => StoreHomeScreen(),
                 'StoreAuth': (context) => StoreAuth(),
                 'StoreMenu': (context) => StoreMenu(),
                 'AddMenuItem': (context) => AddMenuItem(),
@@ -85,40 +85,40 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Colors.grey,
-      //   title: Text(widget.title),
-      // ),
+        // appBar: AppBar(
+        //   backgroundColor: Colors.grey,
+        //   title: Text(widget.title),
+        // ),
         body: StreamBuilder(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapShot) {
-            if (snapShot.hasData && snapShot.data != null) {
-              return StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(snapShot.data.uid)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  if (snapshot.hasData && snapshot.data != null) {
-                    final user = snapshot.data.data();
-                    if (user['userRole'] == 'Store') {
-                      return StoreHomeScreen();
-                    } else {
-                      return Home();
-                    }
-                  }
-                  return Material(
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                },
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapShot) {
+        if (snapShot.hasData && snapShot.data != null) {
+          return StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection("users")
+                .doc(snapShot.data.uid)
+                .snapshots(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                final user = snapshot.data.data();
+                if (user['userRole'] == 'Store') {
+                  return StoreHomeScreen();
+                } else {
+                  return Home();
+                }
+              }
+              return Material(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
               );
-            } else {
-              return homePageLogin(context);
-            }
-          },
-        ));
+            },
+          );
+        } else {
+          return homePageLogin(context);
+        }
+      },
+    ));
   }
 }

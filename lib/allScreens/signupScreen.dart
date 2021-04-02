@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -106,7 +105,7 @@ class _SignUpState extends State<SignUp> {
                           number = double.parse(numberController.text);
                           password = passwordConfirmController.text;
                           print(username + number.toString() + password + email);
-                          RegisterUser();
+                          registerUser();
                         });
                       }else{
                         setState(() {
@@ -135,7 +134,7 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  Future RegisterUser() async {
+  Future registerUser() async {
     setState(() {
       _isLoading = true;
     });
