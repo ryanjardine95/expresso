@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expresso_mobile_app/allScreens/storeHomeScreen.dart';
-import 'package:expresso_mobile_app/helpers/location_helper.dart';
+import 'package:expresso_mobile_app/helpers/locationModel.dart';
+import 'package:expresso_mobile_app/widgets/location_input.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 
 class StoreRegister extends StatefulWidget {
   static const routeName = '/StoreLogin';
@@ -14,6 +13,7 @@ class StoreRegister extends StatefulWidget {
 }
 
 class _StoreRegisterState extends State<StoreRegister> {
+  LocationModel locationHelper;
   String yourName;
   String storeName;
   String emailAdress;
@@ -36,6 +36,9 @@ class _StoreRegisterState extends State<StoreRegister> {
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   CollectionReference stores = FirebaseFirestore.instance.collection("stores");
 
+  void _selectPlace(double lat, double lng) {
+    locationHelper = LocationModel(latitiude: lat, longitude: lng);
+  }
 
   Future fireBaseRegister() async {
     setState(() {
@@ -43,7 +46,7 @@ class _StoreRegisterState extends State<StoreRegister> {
     });
     try {
       UserCredential storeCredential =
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailAdress,
         password: passWord,
       );
@@ -55,21 +58,20 @@ class _StoreRegisterState extends State<StoreRegister> {
         'email': emailAdress,
         'phone': phoneNumber,
         'password': passWord,
-        'latitude': latitude,
-        'longitude': longitude,
+        'latitude': locationHelper.latitiude.roundToDouble(),
+        'longitude': locationHelper.longitude.roundToDouble(),
         'userRole': 'Store',
       });
 
       await stores.add({
         'userid': storeCredential.user.uid,
-        'latitude': latitude,
-        'longitude': longitude,
+        'latitude': locationHelper.latitiude,
+        'longitude': locationHelper.longitude,
       });
       setState(() {
         _isLoading = false;
       });
-      Navigator.of(context)
-          .pushReplacementNamed(StoreHomeScreen.routeName);
+      Navigator.of(context).pushReplacementNamed(StoreHomeScreen.routeName);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -96,6 +98,7 @@ class _StoreRegisterState extends State<StoreRegister> {
         emailAdress = emailAdressController.text;
         phoneNumber = double.parse(phoneNumberContoller.text);
         passWord = passWordController.text;
+
         fireBaseRegister();
         print(yourName + passWord);
       });
@@ -120,7 +123,7 @@ class _StoreRegisterState extends State<StoreRegister> {
             child: CircularProgressIndicator(),
           )
         : Center(
-          child: SingleChildScrollView(
+            child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(25),
                 child: Column(
@@ -193,85 +196,17 @@ class _StoreRegisterState extends State<StoreRegister> {
                           });
                           print(_counter);
                         },
-                        child: Text('Next')
-                    ),
-                    ElevatedButton(onPressed: (){
-                      Navigator.pop(context);
-                    }, child: Text("Back"))
+                        child: Text('Next')),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("Back"))
                   ],
                 ),
               ),
             ),
-        );
-  }
-
-  String _previewImageUrl;
-  bool _isGettingLocal = false;
-  double latitude;
-  double longitude;
-  Future<void> _getCurrentUserLocation() async {
-    final locData = await Location().getLocation();
-    final staticMap = LocationHelper.generateLocationPreviewImage(
-        latitude: locData.latitude, longitude: locData.longitude);
-    setState(() {
-      _previewImageUrl = staticMap;
-      _isGettingLocal = true;
-      latitude = locData.latitude;
-      longitude = locData.longitude;
-    });
-    print(locData.latitude + locData.longitude);
-  }
-
-  Widget getLocation() {
-    if (_previewImageUrl != null) {
-      _isGettingLocal = false;
-    }
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Choose you current Location'),
-          SizedBox(
-            height: 10,
-          ),
-          _isGettingLocal
-              ? CircularProgressIndicator()
-              : Container(
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.grey)),
-                  alignment: Alignment.center,
-                  height: 170,
-                  width: double.infinity,
-                  child: _previewImageUrl == null
-                      ? Text(
-                          'No Location Chosen',
-                          textAlign: TextAlign.center,
-                        )
-                      : Image.network(
-                          _previewImageUrl,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        ),
-                ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton.icon(
-                onPressed: _getCurrentUserLocation,
-                icon: Icon(Icons.location_on),
-                label: Text('Current Location'),
-              ),
-            ],
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              await signUpStore();
-            },
-            child: Text("Done"),
-          )
-        ],
-      ),
-    );
+          );
   }
 
   @override
@@ -281,7 +216,12 @@ class _StoreRegisterState extends State<StoreRegister> {
           ? Center(child: CircularProgressIndicator())
           : _counter == 0
               ? firstSignUp()
-              : Center(child: getLocation()),
+              : Center(
+                  child: LocationInput(
+                    _selectPlace,
+                    signUpStore
+                  ),
+                ),
     );
   }
 }

@@ -39,38 +39,51 @@ class _HomeState extends State<Home> {
     newGoogleMapController
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
-
+@override
+  void initState() {
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     Future<void> getStoreList() async {
-      try{
-        await FirebaseFirestore.instance.collection("stores").get().then((value) {value.docs.forEach((element) {
-          print(element.data());
-          setState(() {
-            stores.add(StoreModel(
-              storeId: element['userid'],
-              latitude: element['latitude'],
-              longitude: element['longitude']
-            ));
-            print(stores);
+      try {
+        await FirebaseFirestore.instance
+            .collection("stores")
+            .get()
+            .then((value) {
+          value.docs.forEach((element) {
+            print(element.data());
+            setState(() {
+              stores.add(StoreModel(
+                  storeId: element['userid'],
+                  latitude: element['latitude'],
+                  longitude: element['longitude']));
+              print(stores);
+            });
           });
         });
-        });
-        await stores.forEach((element) {
+        stores.forEach((element) {
           _markers.add(Marker(
             markerId: MarkerId(element.storeId),
             position: LatLng(element.latitude, element.longitude),
-            onTap: (){
+            onTap: () {
+              
               print(Text("you clicked ${element.storeId} store"));
             },
           ));
         });
         print(_markers);
-      }catch(e){
-        throw(e);
+      } catch (e) {
+        throw (e);
       }
     }
+
+   
+   
     return Scaffold(
+      appBar: AppBar(
+        title: Text(''),
+      ),
       body: Stack(
         children: [
           GoogleMap(
@@ -112,10 +125,11 @@ class _HomeState extends State<Home> {
               )),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
       floatingActionButton: Padding(
         padding: const EdgeInsets.fromLTRB(10.0, 0, 60.0, 0),
         child: FloatingActionButton.extended(
-            onPressed: (){
+            onPressed: () {
               auth.signOut();
               Navigator.pushNamed(context, '/');
             },
