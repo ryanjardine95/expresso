@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expresso_mobile_app/models/menuItem.dart';
 import 'package:expresso_mobile_app/models/storeModel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
@@ -21,6 +23,7 @@ class _HomeState extends State<Home> {
 
   Set<Marker> _markers = {};
 
+  List<MenuItem> storeMenu = [];
   //google maps
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController newGoogleMapController;
@@ -32,6 +35,8 @@ class _HomeState extends State<Home> {
     zoom: 14.4746,
   );
 
+  bool _showMenu = false;
+
   void locateUser() async {
     Position position = await Geolocator.getCurrentPosition();
     LatLng latLng = LatLng(position.latitude, position.longitude);
@@ -39,10 +44,13 @@ class _HomeState extends State<Home> {
     newGoogleMapController
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
-@override
+
+  @override
   void initState() {
+    storeMenu.clear();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     Future<void> getStoreList() async {
@@ -54,10 +62,13 @@ class _HomeState extends State<Home> {
           value.docs.forEach((element) {
             print(element.data());
             setState(() {
-              stores.add(StoreModel(
+              stores.add(
+                  StoreModel(
                   storeId: element['userid'],
                   latitude: element['latitude'],
-                  longitude: element['longitude']));
+                  longitude: element['longitude']),
+
+               );
               print(stores);
             });
           });
@@ -67,7 +78,7 @@ class _HomeState extends State<Home> {
             markerId: MarkerId(element.storeId),
             position: LatLng(element.latitude, element.longitude),
             onTap: () {
-              
+              getMenu(element.storeId);
               print(Text("you clicked ${element.storeId} store"));
             },
           ));
@@ -78,12 +89,10 @@ class _HomeState extends State<Home> {
       }
     }
 
-   
-   
     return Scaffold(
-      appBar: AppBar(
-        title: Text(''),
-      ),
+      // appBar: AppBar(
+      //   title: Text(''),
+      // ),
       body: Stack(
         children: [
           GoogleMap(
@@ -103,26 +112,120 @@ class _HomeState extends State<Home> {
             },
             markers: _markers,
           ),
-          Positioned(
-              top: 100.0,
-              left: 10.0,
-              right: 10.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: [
-                      Text("Begin by selecting your nearest store!",
-                          style: TextStyle(fontSize: 20.0),
-                          textAlign: TextAlign.center),
-                    ],
+          _showMenu
+              ? Positioned(
+                  top: 600,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child:Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Text("Select your favourite items!"),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(15.0),
+                              child: InkWell(
+                                child: Text("back"),
+                                onTap: (){
+                                  setState(() {
+                                    storeMenu.clear();
+                                    _showMenu = false;
+                                  });
+                                },
+                              ),
+                            ),
+                          ]
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: storeMenu.length,
+                            itemBuilder: (context, i){
+                              return Card(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: ListTile(
+                                        title: Text('${storeMenu[i].name}'),
+                                        subtitle: Text('${storeMenu[i].description}'),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text('Price: ${storeMenu[i].price}'),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: IconButton(
+                                        icon: Icon(Icons.add),
+                                        onPressed: (){
+                                          setState(() {
+                                            storeMenu[i].numberOrdered ++;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: IconButton(
+                                        icon: Icon(Icons.remove),
+                                        onPressed: (){
+                                          setState(() {
+                                            storeMenu[i].numberOrdered --;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          Text("In Cart:"),
+                                          Text("${storeMenu[i].numberOrdered}")
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        )]
+                    ),
                   ),
-                ),
-              )),
+                )
+              : Positioned(
+                  bottom: 150.0,
+                  left: 10.0,
+                  right: 10.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          Text("Begin by selecting your nearest store!",
+                              style: TextStyle(fontSize: 20.0),
+                              textAlign: TextAlign.center),
+                        ],
+                      ),
+                    ),
+                  )),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
@@ -140,5 +243,33 @@ class _HomeState extends State<Home> {
       //   onPressed: () => FirebaseAuth.instance.signOut(),
       // ),
     );
+  }
+
+  Future getMenu(String storeId) async {
+    try {
+      storeMenu.clear();
+      _showMenu = !_showMenu;
+      print(_showMenu);
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(storeId)
+          .collection('menu')
+          .get()
+          .then((value) {
+        value.docs.forEach((element) {
+          setState(() {
+            storeMenu.add(MenuItem(
+              name: element.data()['name'],
+              description: element.data()['description'],
+              price: element.data()['price'],
+                numberOrdered: 0,
+            ));
+            print(storeMenu);
+          });
+        });
+      });
+    } catch (e) {
+      throw (e);
+    }
   }
 }
