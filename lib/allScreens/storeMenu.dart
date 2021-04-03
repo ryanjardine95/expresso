@@ -31,7 +31,8 @@ class _StoreMenuState extends State<StoreMenu> {
               name: element.data()['name'],
               description: element.data()['description'],
               price: element.data()['price'],
-            ));
+            ),
+            );
             print(menuList);
           });
         });
