@@ -106,7 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 AsyncSnapshot<DocumentSnapshot> snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
                 final user = snapshot.data.data();
-
                 if (user['userRole'] == 'Store') {
                   return StoreHomeScreen();
                 } else {

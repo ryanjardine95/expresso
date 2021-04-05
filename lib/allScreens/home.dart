@@ -50,7 +50,6 @@ class _HomeState extends State<Home> {
     storeMenu.clear();
     super.initState();
   }
-
   void showBottomSheetMenu(BuildContext context, String storeId) async {
     final data =
         await FirebaseFirestore.instance.collection('users').doc(storeId).get();
@@ -200,6 +199,12 @@ class _HomeState extends State<Home> {
                     latitude: element['latitude'],
                     longitude: element['longitude']),
               );
+                  StoreModel(
+                  storeId: element['userid'],
+                  latitude: element['latitude'],
+                  longitude: element['longitude']),
+
+               );
               print(stores);
             });
           });
@@ -210,6 +215,8 @@ class _HomeState extends State<Home> {
             position: LatLng(element.latitude, element.longitude),
             onTap: () async {
               await getMenu(element.storeId);
+            onTap: () {
+              getMenu(element.storeId);
               print(Text("you clicked ${element.storeId} store"));
               showBottomSheetMenu(context, element.storeId);
             },
@@ -261,9 +268,120 @@ class _HomeState extends State<Home> {
                           style: TextStyle(fontSize: 20.0),
                           textAlign: TextAlign.center),
                     ],
+          _showMenu
+              ? Positioned(
+                  top: 600,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child:Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Text("Select your favourite items!"),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(15.0),
+                              child: InkWell(
+                                child: Text("back"),
+                                onTap: (){
+                                  setState(() {
+                                    storeMenu.clear();
+                                    _showMenu = false;
+                                  });
+                                },
+                              ),
+                            ),
+                          ]
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: storeMenu.length,
+                            itemBuilder: (context, i){
+                              return Card(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: ListTile(
+                                        title: Text('${storeMenu[i].name}'),
+                                        subtitle: Text('${storeMenu[i].description}'),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text('Price: ${storeMenu[i].price}'),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: IconButton(
+                                        icon: Icon(Icons.add),
+                                        onPressed: (){
+                                          setState(() {
+                                            storeMenu[i].numberOrdered ++;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: IconButton(
+                                        icon: Icon(Icons.remove),
+                                        onPressed: (){
+                                          setState(() {
+                                            storeMenu[i].numberOrdered --;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          Text("In Cart:"),
+                                          Text("${storeMenu[i].numberOrdered}")
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        )]
+                    ),
                   ),
-                ),
-              )),
+                )
+              : Positioned(
+                  bottom: 150.0,
+                  left: 10.0,
+                  right: 10.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          Text("Begin by selecting your nearest store!",
+                              style: TextStyle(fontSize: 20.0),
+                              textAlign: TextAlign.center),
+                        ],
+                      ),
+                    ),
+                  )),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
@@ -301,6 +419,7 @@ class _HomeState extends State<Home> {
               description: element.data()['description'],
               price: element.data()['price'],
               numberOrdered: 0,
+                numberOrdered: 0,
             ));
             print(storeMenu);
           });
