@@ -50,6 +50,137 @@ class _HomeState extends State<Home> {
     storeMenu.clear();
     super.initState();
   }
+  void showBottomSheetMenu(BuildContext context, String storeId) async {
+    final data =
+        await FirebaseFirestore.instance.collection('users').doc(storeId).get();
+    final storeName = data.data()['storeName'];
+    showModalBottomSheet(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 8,
+        enableDrag: true,
+        isDismissible: false,
+        isScrollControlled: true,
+        context: context,
+        builder: (ctx) => Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Wrap(
+                children: [
+                  Column(children: [
+                    Center(
+                      child: Text(
+                        storeName,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Row(children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Text("Select your favourite items!"),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: InkWell(
+                          child: Text(
+                            "back",
+                            style: TextStyle(fontSize: 15),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              Navigator.of(context).pop();
+                              storeMenu.clear();
+                              _showMenu = false;
+                            });
+                          },
+                        ),
+                      ),
+                    ]),
+                    Container(
+                      padding: EdgeInsets.all(10.0),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: storeMenu.length,
+                        itemBuilder: (context, i) {
+                          return Card(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ListTile(
+                                    title: Row(
+                                      children: [
+                                        Text('${storeMenu[i].name}'),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text("${storeMenu[i].numberOrdered}")
+                                      ],
+                                    ),
+                                    subtitle:
+                                        Text('${storeMenu[i].description}'),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text('Price: ${storeMenu[i].price}'),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    top: 8,
+                                    bottom: 8,
+                                    left: 0,
+                                  ),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.add,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        print('you clicked plus');
+                                        storeMenu[i].numberOrdered++;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 8, bottom: 8, left: 8, right: 2),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.remove,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        print('you clicked minus');
+                                        storeMenu[i].numberOrdered--;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.check),
+                      onPressed: () {},
+                    ),
+                  ]),
+                ],
+              ),
+            ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +194,11 @@ class _HomeState extends State<Home> {
             print(element.data());
             setState(() {
               stores.add(
+                StoreModel(
+                    storeId: element['userid'],
+                    latitude: element['latitude'],
+                    longitude: element['longitude']),
+              );
                   StoreModel(
                   storeId: element['userid'],
                   latitude: element['latitude'],
@@ -77,9 +213,12 @@ class _HomeState extends State<Home> {
           _markers.add(Marker(
             markerId: MarkerId(element.storeId),
             position: LatLng(element.latitude, element.longitude),
+            onTap: () async {
+              await getMenu(element.storeId);
             onTap: () {
               getMenu(element.storeId);
               print(Text("you clicked ${element.storeId} store"));
+              showBottomSheetMenu(context, element.storeId);
             },
           ));
         });
@@ -112,6 +251,23 @@ class _HomeState extends State<Home> {
             },
             markers: _markers,
           ),
+          Positioned(
+              bottom: 150.0,
+              left: 10.0,
+              right: 10.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      Text("Begin by selecting your nearest store!",
+                          style: TextStyle(fontSize: 20.0),
+                          textAlign: TextAlign.center),
+                    ],
           _showMenu
               ? Positioned(
                   top: 600,
@@ -262,6 +418,7 @@ class _HomeState extends State<Home> {
               name: element.data()['name'],
               description: element.data()['description'],
               price: element.data()['price'],
+              numberOrdered: 0,
                 numberOrdered: 0,
             ));
             print(storeMenu);

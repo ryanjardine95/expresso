@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expresso_mobile_app/allScreens/UserLoginScreen.dart';
 import 'package:expresso_mobile_app/allScreens/addMenuItem.dart';
+import 'package:expresso_mobile_app/allScreens/splash_loadingScreen.dart';
 import 'package:expresso_mobile_app/allScreens/storeAuth.dart';
 import 'package:expresso_mobile_app/allScreens/storeHomeScreen.dart';
 import 'package:expresso_mobile_app/allScreens/storeSignup.dart';
@@ -92,6 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
         body: StreamBuilder(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapShot) {
+        if (snapShot.connectionState == ConnectionState.waiting) {
+          return SplashLoadingScreen();
+        }
         if (snapShot.hasData && snapShot.data != null) {
           return StreamBuilder(
             stream: FirebaseFirestore.instance
