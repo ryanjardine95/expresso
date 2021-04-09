@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
                 'Home': (context) => Home(),
                 'StoreLogIn': (context) => StoreLogin(),
                 'StoreRegister': (context) => StoreRegister(),
-                StoreHomeScreen.routeName: (context) => StoreHomeScreen(),
+                "StoreHome": (context) => StoreHomeScreen(),
                 'StoreAuth': (context) => StoreAuth(),
                 'StoreMenu': (context) => StoreMenu(),
                 'AddMenuItem': (context) => AddMenuItem(),

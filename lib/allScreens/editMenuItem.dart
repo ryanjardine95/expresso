@@ -99,6 +99,7 @@ class _EditMenuItemState extends State<EditMenuItem> {
         "name" : productName.text,
         "description" : productDescription.text,
         "price" : productPrice.text,
+        "numberOrdered" : 0,
       });
       setState(() {
         _isLoading = false;
